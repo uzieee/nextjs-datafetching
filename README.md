@@ -11,11 +11,10 @@ npm install
 
 2. Create a `.env.local` file in the root directory with your PetFinder API credentials:
 ```
-PETFINDER_API_KEY=your-api-key-here
-PETFINDER_API_SECRET=your-api-secret-here
+PETFINDER_API_KEY=y
+PETFINDER_API_SECRET=
 ```
 
-You can get your API key and secret from [PetFinder Developers](https://www.petfinder.com/developers/).
 
 3. Run the development server:
 ```bash
