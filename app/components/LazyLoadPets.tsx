@@ -22,10 +22,17 @@ export default function LazyLoadPets({ initialPets, initialHasMore, searchParams
   const [page, setPage] = useState(2)
   const observerTarget = useRef<HTMLDivElement>(null)
   const searchParamsRef = useRef(searchParams)
+  const isInitialMount = useRef(true)
 
   useEffect(() => {
     const currentParams = JSON.stringify(searchParams)
     const prevParams = JSON.stringify(searchParamsRef.current)
+    
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      searchParamsRef.current = searchParams
+      return
+    }
     
     if (currentParams !== prevParams) {
       const uniquePets = initialPets.filter((pet, index, self) => 
@@ -39,7 +46,9 @@ export default function LazyLoadPets({ initialPets, initialHasMore, searchParams
   }, [initialPets, initialHasMore, searchParams])
 
   const loadMore = useCallback(async () => {
-    if (loading || !hasMore) return
+    if (loading || !hasMore) {
+      return
+    }
 
     setLoading(true)
     try {
@@ -55,6 +64,7 @@ export default function LazyLoadPets({ initialPets, initialHasMore, searchParams
       if (data.error) {
         console.error('Error loading pets:', data.error)
         setHasMore(false)
+        setLoading(false)
         return
       }
 
@@ -64,7 +74,7 @@ export default function LazyLoadPets({ initialPets, initialHasMore, searchParams
           const newPets = data.pets.filter((pet: PetfinderAnimal) => !existingIds.has(pet.id))
           return [...prev, ...newPets]
         })
-        setHasMore(data.hasMore)
+        setHasMore(data.hasMore !== undefined ? data.hasMore : false)
         setPage((prev) => prev + 1)
       } else {
         setHasMore(false)
@@ -78,13 +88,15 @@ export default function LazyLoadPets({ initialPets, initialHasMore, searchParams
   }, [loading, hasMore, page, searchParams])
 
   useEffect(() => {
+    if (!hasMore) return
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading) {
           loadMore()
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '100px' }
     )
 
     const currentTarget = observerTarget.current
@@ -137,7 +149,7 @@ export default function LazyLoadPets({ initialPets, initialHasMore, searchParams
       </div>
 
       {hasMore && (
-        <div ref={observerTarget} className="load-more-trigger">
+        <div ref={observerTarget} className="load-more-trigger" style={{ minHeight: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {loading && (
             <div className="loading">
               Loading more pets...
