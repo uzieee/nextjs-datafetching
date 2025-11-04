@@ -60,8 +60,8 @@ export default function LazyLoadPets({ initialPets, initialHasMore, searchParams
 
       if (data.pets && data.pets.length > 0) {
         setPets((prev) => {
-          const existingIds = new Set(prev.map(pet => pet.id))
-          const newPets = data.pets.filter(pet => !existingIds.has(pet.id))
+          const existingIds = new Set(prev.map((pet: PetfinderAnimal) => pet.id))
+          const newPets = data.pets.filter((pet: PetfinderAnimal) => !existingIds.has(pet.id))
           return [...prev, ...newPets]
         })
         setHasMore(data.hasMore)
