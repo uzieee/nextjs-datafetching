@@ -143,6 +143,7 @@ export async function fetchAnimals(params?: {
   location?: string;
   distance?: number;
   limit?: number;
+  page?: number;
 }): Promise<PetfinderResponse> {
   const token = await getAccessToken();
 
@@ -158,6 +159,9 @@ export async function fetchAnimals(params?: {
   }
   if (params?.limit) {
     searchParams.append('limit', params.limit.toString());
+  }
+  if (params?.page) {
+    searchParams.append('page', params.page.toString());
   }
 
   const url = `https://api.petfinder.com/v2/animals?${searchParams.toString()}`;
